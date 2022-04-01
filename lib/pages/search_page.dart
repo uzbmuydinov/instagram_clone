@@ -42,7 +42,6 @@ class _SearchPageState extends State<SearchPage> {
       someone.followed = true;
       isLoading = false;
     });
-
     DataService.storePostsToMyFeed(someone);
   }
 
