@@ -25,12 +25,12 @@ class Network {
     return null;
   }
 
-  static Map<String, dynamic> paramsCreate(String token,String name) {
+  static Map<String, dynamic> paramsCreate(String token,String fullName) {
     Map<String, dynamic> params = {};
     params.addAll({
       "notification": {
         "title": "Instagram Clone",
-        "body": "$name followed you"
+        "body": "$fullName followed you"
       },
       "registration_ids": [token],
       "click_action": "FLUTTER_NOTIFICATION_CLICK"
