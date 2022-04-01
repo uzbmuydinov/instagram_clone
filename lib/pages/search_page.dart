@@ -63,7 +63,6 @@ class _SearchPageState extends State<SearchPage> {
   void _notification(User user)async{
     String token = await HiveDB.loadFCM();
     Network.POST(Network.API_CREATE, Network.paramsCreate(token,user.fullName)).then((value) => {
-
     });
   }
 
