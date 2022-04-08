@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagramclon/models/post_model.dart';
-import 'package:instagramclon/services/data_service.dart';
-import 'package:instagramclon/services/utils.dart';
+import 'package:get/get.dart';
+import 'package:instagramclon/controllers/feed_controller.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomePage1 extends StatefulWidget {
@@ -15,69 +14,20 @@ class HomePage1 extends StatefulWidget {
 }
 
 class _HomePage1State extends State<HomePage1> {
-  bool isLoading = false;
-  List<Post> postList = [];
 
-  void _apiLoadFeeds() {
-    setState(() {
-      isLoading = true;
-    });
-    DataService.loadFeeds().then((value) => {
-          _resLoadFeeds(value),
-        });
-  }
-
-  void _resLoadFeeds(List<Post> list) {
-    setState(() {
-      isLoading = false;
-      postList = list;
-    });
-  }
-
-  void _apiPostLike(Post post) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    await DataService.likePost(post, true);
-
-    setState(() {
-      isLoading = false;
-      post.liked = true;
-    });
-  }
-
-  void _apiPostUnLike(Post post) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    await DataService.likePost(post, false);
-
-    setState(() {
-      isLoading = false;
-      post.liked = false;
-    });
-  }
-
-  void _actionRemovePost(Post post)async{
-    var result = await Utils.dialogCommon(context, "Do you want to remove this post", "Instagram clone", false);
-    if(result){
-      DataService.removePost(post).then((value) => {
-        _apiLoadFeeds()
-      });
-    }
-  }
 
   @override
   void initState() {
-    _apiLoadFeeds();
+    // TODO: implement initState
     super.initState();
+    Get.find<FeedController>().apiLoadFeeds();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GetBuilder(
+      init: FeedController(),
+        builder: (FeedController _controller) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
@@ -101,15 +51,15 @@ class _HomePage1State extends State<HomePage1> {
         ],
       ),
       body: ListView.builder(
-        itemCount: postList.length,
+        itemCount: _controller.postList.length,
         itemBuilder: (context, index) {
-          return _itemOfPost(index);
+          return _itemOfPost(index,_controller);
         },
       ),
-    );
+    ));
   }
 
-  Widget _itemOfPost(index) {
+  Widget _itemOfPost(index,FeedController controller) {
     return Container(
       color: Colors.white,
       child: Column(
@@ -138,12 +88,12 @@ class _HomePage1State extends State<HomePage1> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          postList[index].fullName!,
+                          controller.postList[index].fullName!,
                           style: TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                         Text(
-                          postList[index].date!,
+                          controller.postList[index].date!,
                         ),
                       ],
                     ),
@@ -151,9 +101,9 @@ class _HomePage1State extends State<HomePage1> {
                 ),
 
                 ///remove
-                postList[index].mine?IconButton(
+                controller.postList[index].mine?IconButton(
                   onPressed: () {
-                    _actionRemovePost(postList[index]);
+                    controller.actionRemovePost(context,controller.postList[index]);
                   },
                   icon: Icon(Icons.more_horiz),
                 ):SizedBox.shrink(),
@@ -163,7 +113,7 @@ class _HomePage1State extends State<HomePage1> {
           CachedNetworkImage(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width,
-            imageUrl: postList[index].img_post,
+            imageUrl: controller.postList[index].img_post,
             placeholder: (context, url) => const Center(
               child: CircularProgressIndicator(),
             ),
@@ -177,22 +127,22 @@ class _HomePage1State extends State<HomePage1> {
                 children: <Widget>[
                   IconButton(
                       onPressed: () {
-                        if (postList[index].liked) {
-                          _apiPostUnLike(postList[index]);
+                        if (controller.postList[index].liked) {
+                          controller.apiPostUnLike(controller.postList[index]);
                         } else {
-                          _apiPostLike(postList[index]);
+                          controller.apiPostLike(controller.postList[index]);
                         }
                       },
                       icon: Icon(
-                        postList[index].liked
+                        controller.postList[index].liked
                             ? Icons.favorite
                             : Icons.favorite_border_outlined,
                         color:
-                            postList[index].liked ? Colors.red : Colors.black,
+                            controller.postList[index].liked ? Colors.red : Colors.black,
                       )),
                   IconButton(
                     onPressed: () {
-                      Share.share('${postList[index].img_post}',subject: postList[index].caption);
+                      Share.share('${controller.postList[index].img_post}',subject: controller.postList[index].caption);
                     },
                     icon: Icon(Icons.share),
                   ),
@@ -210,7 +160,7 @@ class _HomePage1State extends State<HomePage1> {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: postList[index].caption,
+                    text: controller.postList[index].caption,
                     style: TextStyle(color: Colors.black),
                   ),
                 ],

@@ -22,14 +22,14 @@ dependencies:
   firebase_auth: ^3.3.11
   cloud_firestore: ^3.1.10
   firebase_storage: ^10.2.9
-  hive: ^2.0.6
-  hive_flutter: ^1.1.0
   fluttertoast: ^8.0.9
   device_info_plus: ^3.2.2
   firebase_messaging: ^11.2.11
   flutter_local_notifications: ^9.4.0
   share_plus: ^3.1.0
   http: ^0.13.4
+  get: ^4.6.1
+  get_storage: ^2.0.3
 
 dev_dependencies:
   flutter_test:

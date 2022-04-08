@@ -1,66 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagramclon/animations/fade_animation.dart';
-import 'package:instagramclon/pages/home_page.dart';
+import 'package:instagramclon/controllers/sign_in_controller.dart';
 import 'package:instagramclon/pages/sign_up_page.dart';
-import 'package:instagramclon/services/utils.dart';
-import '../services/auth_service.dart';
-import '../services/hive_service.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
+class SignInPage extends StatelessWidget {
+  SignInPage({Key? key}) : super(key: key);
   static const String id = "sign_in_page";
 
-  @override
-  _SignInPageState createState() => _SignInPageState();
-}
 
-class _SignInPageState extends State<SignInPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool isLoading = false;
-  String error = "";
-
-  void  _doSingIn() async{
-    String email = emailController.text.trim().toString();
-    String password = passwordController.text.trim().toString();
-
-    setState(() {
-      isLoading = true;
-    });
-
-    if(email.isNotEmpty || password.isNotEmpty) {
-      await AuthService.signInUser(email, password).then((user) => {
-        _getFirebaseUser(user),
-      });
-    }
-
-    setState(() {
-      isLoading = false;
-      error = "Please enter email or password";
-    });
-    return;
-  }
-
-  void _getFirebaseUser(Map<String, User?> map)async{
-    setState(() {
-      isLoading = false;
-    });
-
-    if(!map.containsKey("SUCCESS")) {
-      if(map.containsKey("user-not-found")) Utils.fireToast("No user found for that email.");
-      if(map.containsKey("wrong-password")) Utils.fireToast("Wrong password provided for that user.");
-      if(map.containsKey("ERROR")) Utils.fireToast("Check Your Information.");
-      return;
-    }
-
-    User? user = map["SUCCESS"];
-    if(user == null) return;
-
-    await HiveDB.storeIdUser(user.uid);
-    Navigator.of(context).pushReplacementNamed(HomePage.id);
-  }
+  final SignInController controller = Get.put(SignInController());
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +53,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
-                      controller: emailController,
+                      controller: controller.emailController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -125,7 +75,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     height: 48,
                     child: TextFormField(
-                      controller: passwordController,
+                      controller: controller.passwordController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -147,7 +97,7 @@ class _SignInPageState extends State<SignInPage> {
                       minWidth: MediaQuery.of(context).size.width,
                       height: 48,
                       onPressed: () {
-                        _doSingIn();
+                        controller.doSingIn();
                       },
                       child: const Text(
                         "Sign In",

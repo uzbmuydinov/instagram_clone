@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:instagramclon/services/get_storage.dart';
 import '../pages/sign_in_page.dart';
 import '../pages/sign_up_page.dart';
-import 'hive_service.dart';
 
 class AuthService{
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -57,7 +57,7 @@ class AuthService{
 
   static void signOutUser(BuildContext context)async{
     await _auth.signOut();
-    HiveDB.removeIdUser().then((value) {
+    GetStorageDB.remove(StorageKeys.UID).then((value) {
       Navigator.of(context).pushReplacementNamed(SignInPage.id);
     });
   }

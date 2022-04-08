@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:instagramclon/models/post_model.dart';
 import 'package:instagramclon/models/user_model.dart';
-import 'package:instagramclon/services/hive_service.dart';
+import 'package:instagramclon/services/get_storage.dart';
 import 'package:instagramclon/services/utils.dart';
 
 
@@ -19,7 +19,7 @@ class DataService{
 
   //user
   static Future<void> storeUser(User user) async {
-    user.uid = HiveDB.loadIdUser();
+    user.uid = (await GetStorageDB.load(StorageKeys.UID))!;
     Map<String,String> params = await Utils.deviceParams();
 
     if (kDebugMode) {
@@ -30,11 +30,12 @@ class DataService{
     user.device_type = params["device_type"]!;
     user.device_token = params["device_token"]!;
 
+    print("salom");
     return instance.collection(userFolder).doc(user.uid).set(user.toJson());
   }
 
   static Future<User> loadUser()async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     var value = await instance.collection(userFolder).doc(uid).get();
     User user = User.fromJson(value.data()!);
 
@@ -61,13 +62,13 @@ class DataService{
   }
 
   static Future<void> updateUser(User user)async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     return instance.collection(userFolder).doc(uid).update(user.toJson());
   }
 
   static Future<List<User>> searchUsers(String keyword)async{
     List<User> users = [];
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     //write request
     var querySnapshot = await instance.collection(userFolder).orderBy("fullName").startAt([keyword]).endAt([keyword + '\uf8ff']).get();
     if (kDebugMode) {
@@ -113,7 +114,7 @@ class DataService{
   }
 
   static Future<Post> storeFeed(Post post) async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
 
     await instance.collection(userFolder).doc(uid).collection(feedFolder).doc(post.id).set(post.toJson());
     return post;
@@ -121,7 +122,7 @@ class DataService{
 
   static Future<List<Post>> loadFeeds()async{
     List<Post> list = [];
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     var querySnapshot = await instance.collection(userFolder).doc(uid).collection(feedFolder).get();
 
     for (var element in querySnapshot.docs) {
@@ -134,7 +135,7 @@ class DataService{
 
   static Future<List<Post>> loadPosts()async{
     List<Post> list = [];
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     var querySnapshot = await instance.collection(userFolder).doc(uid).collection(postFolder).get();
 
     for (var element in querySnapshot.docs) {
@@ -156,7 +157,7 @@ class DataService{
   }
 
   static Future<Post> likePost(Post post, bool like)async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     post.liked = like;
 
     await instance.collection(userFolder).doc(uid).collection(feedFolder).doc(post.id).update(post.toJson());
@@ -169,7 +170,7 @@ class DataService{
   }
 
   static Future<List<Post>> loadLikes()async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     List<Post> posts = [];
 
     var querySnapshot = await instance.collection(userFolder).doc(uid).collection(feedFolder).where("liked" , isEqualTo: true).get();
@@ -242,12 +243,12 @@ class DataService{
   }
 
   static Future removeFeed(Post post)async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     return await instance.collection(userFolder).doc(uid).collection(feedFolder).doc(post.id).delete();
   }
 
   static Future removePost(Post post)async{
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;
     await removeFeed(post);
     return await instance.collection(userFolder).doc(uid).collection(postFolder).doc(post.id).delete();
   }

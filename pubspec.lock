@@ -345,20 +345,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.0.9"
-  hive:
+  get:
     dependency: "direct main"
     description:
-      name: hive
+      name: get
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
-  hive_flutter:
+    version: "4.6.1"
+  get_storage:
     dependency: "direct main"
     description:
-      name: hive_flutter
+      name: get_storage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "2.0.3"
   http:
     dependency: "direct main"
     description:

@@ -6,7 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:instagramclon/services/hive_service.dart';
+
+import 'get_storage.dart';
 
 class Utils {
   static void fireToast(String msg) {
@@ -51,7 +52,7 @@ class Utils {
   static Future<Map<String, String>> deviceParams() async {
     Map<String, String> params = {};
     var deviceInfo = DeviceInfoPlugin();
-    String fcm_token = await HiveDB.loadFCM();
+    String fcm_token = await GetStorageDB.load(StorageKeys.TOKEN) as String;;
 
     if (Platform.isIOS) {
       var iosDeviceInfo = await deviceInfo.iosInfo;

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:instagramclon/services/hive_service.dart';
+import 'package:instagramclon/services/get_storage.dart';
 
 class FileService {
   static final Reference _storage = FirebaseStorage.instance.ref();
@@ -10,7 +10,7 @@ class FileService {
 
   static Future<String> uploadImage(File image, String folder) async {
     // image name
-    String uid = HiveDB.loadIdUser();
+    String uid = (await GetStorageDB.load(StorageKeys.UID))!;;
     String imgName = uid;
     Reference storageRef = _storage.child(folder).child(imgName);
     UploadTask uploadTask = storageRef.putFile(image);

@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:instagramclon/animations/fade_animation.dart';
 import 'package:instagramclon/pages/home_page.dart';
-import 'package:instagramclon/services/hive_service.dart';
+import 'package:instagramclon/services/get_storage.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -27,7 +27,7 @@ class _SplashPageState extends State<SplashPage> {
         .requestPermission(sound: true, badge: true, alert: true);
     _firebaseMessaging.getToken().then((String? token) {
       assert(token != null);
-      HiveDB.saveFCM(token!);
+      GetStorageDB.store(StorageKeys.TOKEN, token!);
     });
   }
 

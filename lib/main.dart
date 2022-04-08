@@ -3,18 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:instagramclon/pages/home_page.dart';
 import 'package:instagramclon/pages/sign_in_page.dart';
 import 'package:instagramclon/pages/sign_up_page.dart';
 import 'package:instagramclon/pages/splash_page.dart';
 import 'package:instagramclon/pages/user_page.dart';
-import 'package:instagramclon/services/hive_service.dart';
+import 'package:instagramclon/services/di_service.dart';
+import 'package:instagramclon/services/get_storage.dart';
 
-void main() async{
-  await Hive.initFlutter();
-  await Hive.openBox(HiveDB.dbName);
+Future main() async{
+  await DIService.init();
+  await GetStorageDB.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   var initAndroidSetting = const AndroidInitializationSettings("@mipmap/ic_launcher");
@@ -34,18 +34,18 @@ class MyApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
-            HiveDB.storeIdUser(snapshot.data!.uid);
+            GetStorageDB.store(StorageKeys.UID,snapshot.data!.uid);
             return const SplashPage();
           } else {
-            HiveDB.removeIdUser();
-            return const SignInPage();
+            GetStorageDB.remove(StorageKeys.UID);
+            return SignInPage();
           }
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Instagram',
       theme: ThemeData(
         primarySwatch: Colors.blue,
